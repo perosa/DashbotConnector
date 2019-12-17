@@ -2,6 +2,7 @@ from flask import Flask, request, Response
 import logging
 import pyfiglet
 import requests
+import os
 
 app = Flask(__name__)
 
@@ -22,8 +23,8 @@ def send_to_dashbot():
 
         platform = 'google'
         version = '11.1.0-rest'
-        api_key = request.args.get('apiKey')
-        type = request.args.get('type')
+        api_key = os.getenv('DASHBOT_API_KEY', 'value does not exist')
+        type = 'incoming'
 
         payload = request.get_json()
         headers = {'Content-Type': 'application/json'}
@@ -37,7 +38,7 @@ def send_to_dashbot():
 
     except Exception as e:
         logging.error('Error {}'.format(str(e)))
-    return Response(str(e), status=500)
+        return Response(str(e), status=500)
 
 
 if __name__ == '__main__':
