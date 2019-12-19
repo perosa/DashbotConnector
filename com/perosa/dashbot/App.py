@@ -11,34 +11,70 @@ logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 
 @app.route('/ping')
-def index():
+def ping():
+    """
+    Ping the endpoint
+    :return:
+    """
     logging.info('/ping')
     return "ping Ok"
 
 
 @app.route('/send', methods=['POST'])
 def send_to_dashbot():
+    """
+    Endpoint
+    :return:
+    """
     try:
         logging.info('send/')
 
+        # validate(request)
+
         platform = 'google'
         version = '11.1.0-rest'
-        api_key = os.getenv('DASHBOT_API_KEY', 'value does not exist')
+        api_key = request.headers['DASHBOT_API_KEY']
         type = 'incoming'
 
         payload = request.get_json()
         headers = {'Content-Type': 'application/json'}
 
-        p = {'platform': platform, 'v': version, 'type': type, 'apiKey': api_key}
-        r = requests.post("https://tracker.dashbot.io/track", params=p, json=payload, headers=headers)
-
-        logging.info(r)
-
-        return "ok"
+        if api_key is None:
+            logging.warning("DASHBOT_API_KEY is undefined")
+            return "Not sent: DASHBOT_API_KEY is undefined"
+        else:
+            p = {'platform': platform, 'v': version, 'type': type, 'apiKey': api_key}
+            r = requests.post("https://tracker.dashbot.io/track", params=p, json=payload, headers=headers)
+            logging.info(r)
+            return "ok"
 
     except Exception as e:
         logging.error('Error {}'.format(str(e)))
         return Response(str(e), status=500)
+
+
+def validate(request):
+    token = os.getenv('DASHBOT_TOKEN', 'tokenUndefined')
+    logging.info(token)
+
+    header = request.headers['Authorization']
+    logging.info(header)
+
+    if header == None or (header != 'Bearer ' + token):
+        raise Exception('Invalid token {} '.format(header))
+
+
+def get_port() -> int:
+    """
+    Retrieves port
+    :return:
+    """
+    port = os.getenv('PORT')
+
+    if port is None:
+        port = 5000
+
+    return port
 
 
 if __name__ == '__main__':
@@ -47,4 +83,4 @@ if __name__ == '__main__':
 
     logging.info('Starting up')
 
-    app.run(port=5000, host='0.0.0.0')
+    app.run(port=get_port(), host='0.0.0.0')
