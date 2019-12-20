@@ -4,10 +4,13 @@ import pyfiglet
 import requests
 import os
 
-app = Flask(__name__)
+try:
+    app = Flask(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
-logging.getLogger('werkzeug').setLevel(logging.ERROR)
+    logging.basicConfig(level=logging.ERROR)
+    logging.getLogger('werkzeug').setLevel(logging.DEBUG)
+except Exception as e:
+    logging.error('Error at startup {}'.format(str(e)))
 
 
 @app.route('/ping')
@@ -64,17 +67,12 @@ def validate(request):
         raise Exception('Invalid token {} '.format(header))
 
 
-def get_port() -> int:
+def get_port():
     """
     Retrieves port
     :return:
     """
-    port = os.getenv('PORT')
-
-    if port is None:
-        port = 5000
-
-    return port
+    return int(os.environ.get("PORT", 5000))
 
 
 if __name__ == '__main__':
@@ -83,4 +81,4 @@ if __name__ == '__main__':
 
     logging.info('Starting up')
 
-    app.run(port=get_port(), host='0.0.0.0')
+    app.run(debug=True, port=get_port(), host='0.0.0.0')
