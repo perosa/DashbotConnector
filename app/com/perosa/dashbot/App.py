@@ -7,10 +7,10 @@ import os
 try:
     app = Flask(__name__)
 
-    logging.basicConfig(level=logging.ERROR)
-    logging.getLogger('werkzeug').setLevel(logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
+    logging.getLogger('werkzeug').setLevel(logging.ERROR)
 except Exception as e:
-    logging.error('Error at startup {}'.format(str(e)))
+    logging.exception("Error at startup")
 
 
 @app.route('/ping')
@@ -52,7 +52,7 @@ def send_to_dashbot():
             return "ok"
 
     except Exception as e:
-        logging.error('Error {}'.format(str(e)))
+        logging.exception("Unexpected error")
         return Response(str(e), status=500)
 
 
