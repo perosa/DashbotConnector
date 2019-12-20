@@ -36,15 +36,15 @@ def send_to_dashbot():
 
         platform = 'google'
         version = '11.1.0-rest'
-        api_key = request.headers['DASHBOT_API_KEY']
+        api_key = request.headers['API_KEY']
         type = 'incoming'
 
         payload = request.get_json()
         headers = {'Content-Type': 'application/json'}
 
         if api_key is None:
-            logging.warning("DASHBOT_API_KEY is undefined")
-            return "Not sent: DASHBOT_API_KEY is undefined"
+            logging.warning("API_KEY is undefined")
+            return "Not sent: API_KEY is undefined"
         else:
             p = {'platform': platform, 'v': version, 'type': type, 'apiKey': api_key}
             r = requests.post("https://tracker.dashbot.io/track", params=p, json=payload, headers=headers)
