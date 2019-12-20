@@ -1,11 +1,11 @@
-FROM python:3
+FROM ubuntu:latest
 
-WORKDIR /app/
-ADD app /app
+RUN apt-get update -y
+RUN apt-get install -y python-pip python-dev build-essential
 
-COPY requirements.txt /app/requirements.txt
-RUN pip install -r /app/requirements.txt
+COPY . /app
+WORKDIR /app
+RUN pip install -r requirements.txt
 
-EXPOSE 5000
-
-ENTRYPOINT python /app/com/perosa/dashbot/App.py
+ENTRYPOINT ["python"]
+CMD ["app/com/perosa/dashbot/App.py"]
